@@ -8,6 +8,17 @@ const express = require('express');
 // https://www.npmjs.com/package/body-parser
 const bodyParser = require('body-parser');
 
+// bring in firestore
+const Firestore = require("@google-cloud/firestore");
+
+// initialize Firestore and set project id from env var
+const firestore = new Firestore(
+    {
+        projectId: process.env.GOOGLE_CLOUD_PROJECT
+    }
+);
+
+
 // create the server
 const app = express();
 
@@ -23,15 +34,6 @@ const mockEvents = {
     ]
 };
 
-// bring in firestore
-const Firestore = require("@google-cloud/firestore");
-
-// initialize Firestore and set project id from env var
-const firestore = new Firestore(
-    {
-        projectId: process.env.GOOGLE_CLOUD_PROJECT
-    }
-);
 
 
 
@@ -54,6 +56,7 @@ app.get('/events', (req, res) => {
     getEvents(req, res);
 });
 
+
 // Adds an event - in a real solution, this would insert into a cloud datastore.
 // Currently this simply adds an event to the mock array in memory
 // this will produce unexpected behavior in a stateless kubernetes cluster. 
@@ -70,6 +73,7 @@ app.post('/event', (req, res) => {
     });
 
 });
+
 
 function getEvents(req, res) {
     firestore.collection("Events").get()
@@ -90,6 +94,7 @@ function getEvents(req, res) {
             res.json(mockEvents);
         });
 };
+
 
 
 app.use((err, req, res, next) => {
